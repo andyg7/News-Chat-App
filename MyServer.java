@@ -12,16 +12,14 @@ public class MyServer extends Thread {
 	public static HashSet<User> loggedInUsers;
 	public static HashSet<QueuedMessage> queuedMessages;
 	private String currUsername;
+
 	public MyServer(Socket s) {
 		this.clientSocket = s;
 		usersHash = new HashMap<String, String>();
 		try (BufferedReader br = new BufferedReader(new FileReader(usersFileName))) {
 			String line;
 			while ((line = br.readLine()) != null) {
-				// process the line.
 				String[] user_password = line.split(" ");
-				System.out.println(user_password[0]);
-				System.out.println(user_password[1]);
 				usersHash.put(user_password[0], user_password[1]);
 			}
 		} catch (IOException e) {
@@ -57,7 +55,6 @@ public class MyServer extends Thread {
 			String outputLine;
 			PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
 			BufferedReader in = new BufferedReader( new InputStreamReader(clientSocket.getInputStream()));
-			//SocketAddress sa = clientSocket.getRemoteSocketAddress();
 
 			System.out.println("Trying to log in user");
 			passwordAttempts = 0;
@@ -69,7 +66,7 @@ public class MyServer extends Thread {
 			while (usernameAttempts < 3) {
 				out.println(outputLine);
 				inputLine = in.readLine();
-				System.out.println("user ented: " + inputLine);
+				System.out.println("user entered: " + inputLine);
 				if (this.usersHash.containsKey(inputLine)) {
 					username = inputLine;
 					break;
@@ -78,16 +75,13 @@ public class MyServer extends Thread {
 			}
 			if (username == null) {
 				return null;
-			} else {
-				System.out.println("Got user " + username);
-			}
+			} 
 
 			outputLine = "Password:";
 			while (passwordAttempts < 3) {
 				out.println(outputLine);
 				inputLine = in.readLine();
 				String currPassword = usersHash.get(username);
-				System.out.println("cur p : " + currPassword);
 				if (inputLine.equals(currPassword)) {
 					password = inputLine;
 					break;
@@ -112,7 +106,6 @@ public class MyServer extends Thread {
 			PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
 			BufferedReader in = new BufferedReader( new InputStreamReader(clientSocket.getInputStream()));
 			SocketAddress sa = clientSocket.getRemoteSocketAddress();
-			System.out.println(sa.toString());
 			outputLine = "Command:";
 			out.println(outputLine);
 
@@ -150,7 +143,6 @@ public class MyServer extends Thread {
 		if (parsedCommand.equals("message")) {
 			String userReceiver = parsedMessage[1];
 			String message = stringBuilderFromArray(parsedMessage, 2, parsedMessage.length);
-			System.out.println("Sending message from "  + this.currUsername + " to " + userReceiver + " with message " + message);
 			sendMessage(userReceiver, message);
 		} else {
 
