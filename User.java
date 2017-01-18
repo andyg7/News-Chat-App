@@ -3,17 +3,23 @@ import java.util.*;
 
 public class User {
 	private String username;
+	private Socket clientSocket;
 	private SocketAddress socketAddress; 
 	private ArrayList<String> blockedUsers;
 
-	public User(String username, SocketAddress socketAddress) {
+	public User(String username, Socket clientSocket) {
 		this.username = username;
-		this.socketAddress = socketAddress;
+		this.clientSocket = clientSocket;
+		this.socketAddress = clientSocket.getRemoteSocketAddress();
 		blockedUsers = new ArrayList<String>();
 	}
 
 	public String getUserName() {
 		return username;
+	}
+
+	public Socket getSocket() {
+		return this.clientSocket;
 	}
 
 	public String getIp() {
