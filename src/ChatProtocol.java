@@ -1,4 +1,5 @@
 public class ChatProtocol {
+
 	public ChatProtocol() {
 
 	}

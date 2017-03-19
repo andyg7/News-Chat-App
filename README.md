@@ -25,3 +25,10 @@ Commands:
 
 - Done
    - Logs user out
+
+TODO
+
+- Add some sort of crypto to communications
+   - messages are sent in cleartext
+- Add client code
+- Add support for me types of commands user can use
