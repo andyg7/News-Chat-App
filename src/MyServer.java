@@ -1,6 +1,10 @@
 import java.net.*;
 import java.io.*;
 import java.util.*;
+import javax.net.ssl.*;
+import java.io.*;
+import java.net.*;
+import java.security.*;
 
 public class MyServer extends Thread {
 
@@ -13,6 +17,7 @@ public class MyServer extends Thread {
 	public static HashSet<User> loggedInUsers;
 	public static HashSet<QueuedMessage> queuedMessages;
 	public static HashSet<BlockedAddress> blockedAddresses;
+	public static int maxNumberOpenConnections = 10;
 
 	public MyServer(Socket s) {
 		this.clientSocket = s;
