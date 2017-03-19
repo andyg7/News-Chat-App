@@ -6,7 +6,7 @@ public class MyServer extends Thread {
 
 	private int portNumber;
 	private Socket clientSocket;
-	private String usersFileName = "user_pass.txt";
+	private String usersFileName = "../database_files/user_pass.txt";
 	private HashMap<String, String> usersHash;
 	private String currUsername;
 	public int blockedTime = 60 * 1000;
