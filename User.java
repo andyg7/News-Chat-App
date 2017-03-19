@@ -42,6 +42,20 @@ public class User {
 		}
 		return false;
 	}
+	
+	/*
+	public int hashCode() {
+		return username.hashCode();
+	}
+	
+	public boolean equals(User o) {
+		return o.getUserName().equals(this.username);
+	}
+	
+	public boolean equals(String s) {
+		return s.equals(this.username);
+	}
+	*/
 
 }
 

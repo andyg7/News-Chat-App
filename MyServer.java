@@ -56,7 +56,6 @@ public class MyServer extends Thread {
 			PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
 			BufferedReader in = new BufferedReader( new InputStreamReader(clientSocket.getInputStream()));
 
-			System.out.println("Trying to log in user");
 			passwordAttempts = 0;
 			usernameAttempts = 0;
 			username = null;
@@ -66,7 +65,6 @@ public class MyServer extends Thread {
 			while (usernameAttempts < 3) {
 				out.println(outputLine);
 				inputLine = in.readLine();
-				System.out.println("user entered: " + inputLine);
 				if (this.usersHash.containsKey(inputLine)) {
 					username = inputLine;
 					break;
@@ -109,14 +107,16 @@ public class MyServer extends Thread {
 			outputLine = "Command:";
 			out.println(outputLine);
 
-			System.out.println("Logged in users");
+			/*
+			   System.out.println("Logged in users");
 
-			Iterator<User> it = MyServer.loggedInUsers.iterator();
-			while (it.hasNext()) {
-				User currUser = it.next();
-				String s = currUser.getUserName();
-				System.out.println(s);
-			}
+			   Iterator<User> it = MyServer.loggedInUsers.iterator();
+			   while (it.hasNext()) {
+			   User currUser = it.next();
+			   String s = currUser.getUserName();
+			   System.out.println(s);
+			   }
+			   */
 
 			while ((inputLine = in.readLine()) != null) {
 				out.println(outputLine);
@@ -144,20 +144,24 @@ public class MyServer extends Thread {
 			String userReceiver = parsedMessage[1];
 			String message = stringBuilderFromArray(parsedMessage, 2, parsedMessage.length);
 			sendMessage(userReceiver, message);
+		} else if (parsedCommand.equals("whoelse")) {
+			StringBuilder sb = new StringBuilder("");
+			Iterator<User> it = MyServer.loggedInUsers.iterator();
+			while (it.hasNext()) {
+				User currUser = it.next();
+				sb.append(currUser.getUserName());
+				sb.append(" ");
+			}
+			String listOfUsers = sb.toString();
+			try {
+				PrintWriter out = new PrintWriter(this.clientSocket.getOutputStream(), true);
+				out.println(listOfUsers);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		} else {
 
 		}
-	}
-
-	private String stringBuilderFromArray(String[] ar, int start, int end) {
-		StringBuilder sb = new StringBuilder("");
-		for (int i = start; i < end; i++) {
-			sb.append(ar[i]);
-			if (i != end) {
-				sb.append(" ");
-			}
-		}
-		return sb.toString();
 	}
 
 	private void sendMessage(String username, String message) {
@@ -169,7 +173,8 @@ public class MyServer extends Thread {
 				if (currUser.getUserName().equals(username)) {
 					Socket receiverSocket = currUser.getSocket();
 					PrintWriter out = new PrintWriter(receiverSocket.getOutputStream(), true);
-					out.println(message);
+					String totalMessage = "Message received from: " + this.currUsername + '\n' + message;
+					out.println(totalMessage);
 					foundUser = true;
 					break;
 				}
@@ -182,6 +187,17 @@ public class MyServer extends Thread {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	private String stringBuilderFromArray(String[] ar, int start, int end) {
+		StringBuilder sb = new StringBuilder("");
+		for (int i = start; i < end; i++) {
+			sb.append(ar[i]);
+			if (i != end) {
+				sb.append(" ");
+			}
+		}
+		return sb.toString();
 	}
 
 	public static void main(String args[]) {
@@ -216,7 +232,4 @@ public class MyServer extends Thread {
 		return false;
 	}
 
-	public static void addQueuedMessage(String username, String message) {
-
-	}
 }
