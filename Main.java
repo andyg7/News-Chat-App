@@ -4,9 +4,7 @@ import java.net.Socket;
 import java.util.HashSet;
 import java.util.Iterator;
 
-
 public class Main {
-	
 	public static void main(String args[]) {
 		MyServer.loggedInUsers = new HashSet<User>();
 		MyServer.queuedMessages = new HashSet<QueuedMessage>();
@@ -23,6 +21,4 @@ public class Main {
 			e.printStackTrace();
 		}
 	}
-
-
 }

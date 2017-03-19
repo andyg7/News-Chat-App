@@ -17,6 +17,10 @@ public class MyServer extends Thread {
 	public MyServer(Socket s) {
 		this.clientSocket = s;
 		usersHash = new HashMap<String, String>();
+		readUserPassword();
+	}
+
+	private void readUserPassword() {
 		try (BufferedReader br = new BufferedReader(new FileReader(usersFileName))) {
 			String line;
 			while ((line = br.readLine()) != null) {
@@ -31,12 +35,32 @@ public class MyServer extends Thread {
 	public void run() {
 		System.out.println("Running server thread");
 		if (this.stillBlocked(this.clientSocket) == true) {
-			System.out.println("This ip is currently blocked. Try again in <= 60 seconds");	
+			String msg = "This ip is currently blocked. Try again in <= 60 seconds";	
+			try {
+				PrintWriter out = new PrintWriter(this.clientSocket.getOutputStream(), true);
+				out.println(msg);
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			try {
+				this.clientSocket.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			return;
 		}
 		this.currUsername = logIn();
 		if (currUsername != null) {
-			System.out.println("Welcome to the great chat app of all time!" + currUsername);
+			try {
+				PrintWriter out = new PrintWriter(this.clientSocket.getOutputStream(), true);
+				String welcomeMsg = "Welcome to the great chat app of all time " + currUsername + "!";
+				out.println(welcomeMsg);
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 			SocketAddress sa = clientSocket.getRemoteSocketAddress();
 			MyServer.loggedInUsers.add(new User(currUsername, clientSocket));
 			processCommands();
@@ -44,7 +68,8 @@ public class MyServer extends Thread {
 			try {
 				System.out.println("Failed to log in!");
 				BlockedAddress blockedAddress = new BlockedAddress();
-				blockedAddress.ip = this.clientSocket.getRemoteSocketAddress().toString();
+				String[] ipParts = this.clientSocket.getRemoteSocketAddress().toString().split(":");
+				blockedAddress.ip = ipParts[0];
 				blockedAddress.timestamp = System.currentTimeMillis();
 				MyServer.blockedAddresses.add(blockedAddress);
 				clientSocket.close();
@@ -52,7 +77,7 @@ public class MyServer extends Thread {
 				e.printStackTrace();
 			}
 		}
-			}
+	}
 
 	private String logIn() {
 		try {
@@ -115,17 +140,6 @@ public class MyServer extends Thread {
 			SocketAddress sa = clientSocket.getRemoteSocketAddress();
 			outputLine = "Command:";
 			out.println(outputLine);
-
-			/*
-			   System.out.println("Logged in users");
-
-			   Iterator<User> it = MyServer.loggedInUsers.iterator();
-			   while (it.hasNext()) {
-			   User currUser = it.next();
-			   String s = currUser.getUserName();
-			   System.out.println(s);
-			   }
-			   */
 
 			while ((inputLine = in.readLine()) != null) {
 				out.println(outputLine);
@@ -208,17 +222,13 @@ public class MyServer extends Thread {
 		}
 		return sb.toString();
 	}
-	
+
 	public boolean stillBlocked(Socket s) {
-		System.out.println("hiii");
-		String currIp = s.getRemoteSocketAddress().toString();
-		System.out.println(currIp);
+		String currIp = s.getRemoteSocketAddress().toString().split(":")[0];
 		Iterator<BlockedAddress> it = MyServer.blockedAddresses.iterator();
 		while (it.hasNext()) {
-			System.out.println("looping for blockd");
 			BlockedAddress currAddress = it.next();
 			if (currAddress.ip.equals(currIp)) {
-				System.out.println("in 1");
 				long now = System.currentTimeMillis();
 				if (now - currAddress.timestamp> blockedTime) {
 					return false;
