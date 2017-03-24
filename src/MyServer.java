@@ -34,7 +34,6 @@ public class MyServer extends Thread {
 		initializeDataStructures();
 		readUserPassword();
 		readAPIKey();
-		String url = "https://newsapi.org/v1/articles?";
 		this.apiHandler = new NewsApi(this.api_key);
 	}
 
@@ -136,6 +135,7 @@ public class MyServer extends Thread {
 			while (usernameAttempts < 3) {
 				out.println(outputLine);
 				inputLine = in.readLine();
+				//System.out.println(inputLine);
 				if (this.usersHash.containsKey(inputLine)) {
 					username = inputLine;
 					break;
@@ -207,8 +207,10 @@ public class MyServer extends Thread {
 			outputLine = "Command:";
 			out.println(outputLine);
 
+			//System.out.println("waiting to get line");
 			while ((inputLine = in.readLine()) != null) {
 				out.println(outputLine);
+				System.out.println(inputLine);
 				if (inputLine.equals("Done")) {
 					break;
 				} else {
@@ -230,7 +232,7 @@ public class MyServer extends Thread {
 		}
 		String parsedCommand = parsedMessage[0];
 		if (parsedCommand.equals("message")) {
-			if (parsedMessage.length != 2) {
+			if (parsedMessage.length <= 2) {
 				return;
 			}
 			String userReceiver = parsedMessage[1];
@@ -239,6 +241,7 @@ public class MyServer extends Thread {
 			sb.append("Message sent from "); 
 			sb.append(this.currUsername); 
 			sb.append(": " + message);
+			//System.out.println("send msssg!");
 			sendMessage(userReceiver, sb.toString());
 		} else if (parsedCommand.equals("whoelse")) {
 			StringBuilder sb = new StringBuilder("");
