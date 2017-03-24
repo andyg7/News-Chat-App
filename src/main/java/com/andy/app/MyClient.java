@@ -20,7 +20,6 @@ public class MyClient implements Runnable {
 		readAPIKey();
 		apiHandler = new NewsApi(this.api_key);
 		this.sender = s;
-		System.out.println("hhhhhhhh");
 	}
 
 	private void readAPIKey() {

@@ -19,7 +19,6 @@
 				</execution>
 			</executions>
 			<configuration>
-				<mainClass>Main</mainClass>
 			</configuration>
 		</plugin>
 	</plugins>

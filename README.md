@@ -12,14 +12,15 @@ e.g. SomeUser SomePasword
 How to run the server:
 
 java MyServer <some_port>
-e.g. java MyServer 4111
+mvn exec:java -Dexec.mainClass=Main -Dexec.args="<port_number>"
 
 How to run client:
 
-Currently just use telnet
-e.g. telnet localhost 4111
+mvn exec:java -Dexec.mainClass=MyClient -Dexec.args="<host> <port_number>"
+
 
 Commands:
+
 - message
    - Sends message to another user e.g. message Andy hey whats up
 
