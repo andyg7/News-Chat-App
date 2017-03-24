@@ -12,7 +12,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.Charset;
-//import com.google.code.gson;
 
 public class NewsApi {
 	private String articlesUrlString;
@@ -58,4 +57,4 @@ public class NewsApi {
 			return null;
 		}
 	}
-	}
+}
