@@ -45,6 +45,7 @@ public class MyServer extends Thread {
 				String[] user_password = line.split(" ");
 				usersHash.put(user_password[0], user_password[1]);
 			}
+			br.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -171,6 +172,7 @@ public class MyServer extends Thread {
 					blockedFromUsers.add(blockedData[0]);
 				}
 			}
+			br.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
