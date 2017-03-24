@@ -3,12 +3,15 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class Main {
 	public static void main(String args[]) {
 		MyServer.loggedInUsers = new HashSet<User>();
 		MyServer.queuedMessages = new HashSet<QueuedMessage>();
 		MyServer.blockedAddresses = new HashSet<BlockedAddress>();
+		Lock lock = new ReentrantLock();
 		try {
 			int portNumber = Integer.parseInt(args[0]);
 			ServerSocket serverSocket = new ServerSocket(portNumber);
@@ -19,7 +22,7 @@ public class Main {
 					System.out.println("Closing socket - too many open");
 					clientSocket.close();
 				} else {
-					MyServer ms = new MyServer(clientSocket);
+					MyServer ms = new MyServer(clientSocket, lock);
 					ms.start();
 				}
 			}

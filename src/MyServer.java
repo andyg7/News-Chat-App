@@ -5,13 +5,19 @@ import javax.net.ssl.*;
 import java.io.*;
 import java.net.*;
 import java.security.*;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class MyServer extends Thread {
 
 	private int portNumber;
 	private Socket clientSocket;
+	private Lock lock;
 	private String usersFileName = "../database_files/user_pass.txt";
+	private String blockedUsersFileName = "../database_files/blocked_users.txt";
 	private HashMap<String, String> usersHash;
+	private HashSet<String> blockedUsers;
+	private HashSet<String> blockedFromUsers;
 	private String currUsername;
 	public int blockedTime = 60 * 1000;
 	public static HashSet<User> loggedInUsers;
@@ -19,10 +25,17 @@ public class MyServer extends Thread {
 	public static HashSet<BlockedAddress> blockedAddresses;
 	public static int maxNumberOpenConnections = 10;
 
-	public MyServer(Socket s) {
+	public MyServer(Socket s, Lock l) {
 		this.clientSocket = s;
-		usersHash = new HashMap<String, String>();
+		this.lock = l;
+		initializeDataStructures();
 		readUserPassword();
+	}
+
+	private void initializeDataStructures() {
+		usersHash = new HashMap<String, String>();
+		blockedUsers = new HashSet<String>();
+		blockedFromUsers = new HashSet<String>();
 	}
 
 	private void readUserPassword() {
@@ -68,6 +81,7 @@ public class MyServer extends Thread {
 			}
 			SocketAddress sa = clientSocket.getRemoteSocketAddress();
 			MyServer.loggedInUsers.add(new User(currUsername, clientSocket));
+			readBlockedUsers();
 			processCommands();
 		} else {
 			try {
@@ -116,7 +130,7 @@ public class MyServer extends Thread {
 
 			if (MyServer.userLoggedIn(username) == true) {
 				System.out.println("User already logged in");
-				sendMessage(this.clientSocket, "You're logged in from somewhere else");
+				sendMessage(this.clientSocket, this.currUsername, "You're logged in from somewhere else");
 				return null;
 			} else {
 				System.out.println("Valid login");
@@ -144,6 +158,26 @@ public class MyServer extends Thread {
 		}
 	}
 
+	private void readBlockedUsers() {
+		this.lock.lock();
+		try (BufferedReader br = new BufferedReader(new FileReader(blockedUsersFileName))) {
+			String line;
+			while ((line = br.readLine()) != null) {
+				String[] blockedData = line.split(" ");
+				if (blockedData[0].equals(this.currUsername)) {
+					blockedUsers.add(blockedData[1]);
+				}
+				if (blockedData[1].equals(this.currUsername)) {
+					blockedFromUsers.add(blockedData[0]);
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			this.lock.unlock();
+		}
+	}
+
 	private void processCommands() {
 		try {
 			String inputLine;
@@ -162,7 +196,7 @@ public class MyServer extends Thread {
 					intrepretCommand(inputLine);
 				}
 			}
-			System.out.println("Removing user: " + this.currUsername);
+			System.out.println("Logging out user: " + this.currUsername);
 			removeLoggedInUser(this.currUsername);
 			clientSocket.close();
 		} catch (IOException e) {
@@ -189,8 +223,10 @@ public class MyServer extends Thread {
 			Iterator<User> it = MyServer.loggedInUsers.iterator();
 			while (it.hasNext()) {
 				User currUser = it.next();
-				sb.append(currUser.getUserName());
-				sb.append(" ");
+				if (!currUser.getUserName().equals(this.currUsername)) {
+					sb.append(currUser.getUserName());
+					sb.append(" ");
+				}
 			}
 			String listOfUsers = sb.toString();
 			try {
@@ -205,60 +241,111 @@ public class MyServer extends Thread {
 			sb.append("Broadcasted message: ");
 			sb.append(message);
 			sendMessageExcept(this.currUsername, sb.toString());
-		} else {
-
-		}
-	}
-
-	private void sendMessage(Socket s, String message) {
-		try {
-			PrintWriter out = new PrintWriter(s.getOutputStream(), true);
-			out.println(message);
-		} catch (IOException e) {
-			e.printStackTrace();
+		} else if (parsedCommand.equals("unblock")) {
+			String userReceiver = parsedMessage[1];
+			unblockUser(userReceiver);
+		} else if (parsedCommand.equals("block")){
+			String userReceiver = parsedMessage[1];
+			blockUser(userReceiver);
 		}
 	}
 
 	private void sendMessage(String username, String message) {
-		try {
-			boolean foundUser = false;
-			Iterator<User> it = MyServer.loggedInUsers.iterator();
-			while (it.hasNext()) {
-				User currUser = it.next();
-				if (currUser.getUserName().equals(username)) {
-					Socket receiverSocket = currUser.getSocket();
-					PrintWriter out = new PrintWriter(receiverSocket.getOutputStream(), true);
-					out.println(message);
-					foundUser = true;
-					break;
-				}
+		boolean foundUser = false;
+		Iterator<User> it = MyServer.loggedInUsers.iterator();
+		while (it.hasNext()) {
+			User currUser = it.next();
+			if (currUser.getUserName().equals(username)) {
+				Socket receiverSocket = currUser.getSocket();
+				sendMessage(receiverSocket, username, message);
+				foundUser = true;
+				break;
 			}
-			if (foundUser == true) {
-				System.out.println("Sent message to " + username + " from " + this.currUsername);
-			} else {
-				System.out.println("Failed to send message to " + username + " from " + this.currUsername);
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
+		}
+		if (foundUser == true) {
+			System.out.println("Sent message to " + username + " from " + this.currUsername);
+		} else {
+			System.out.println("Failed to send message to " + username + " from " + this.currUsername);
 		}
 	}
 
 	private void sendMessageExcept(String username, String message) {
+		Iterator<User> it = MyServer.loggedInUsers.iterator();
+		while (it.hasNext()) {
+			User currUser = it.next();
+			if (!currUser.getUserName().equals(username)) {
+				Socket receiverSocket = currUser.getSocket();
+				sendMessage(receiverSocket, currUser.getUserName(), message);
+			}
+		}
+	}
+
+	private void sendMessage(Socket s, String userName, String message) {
 		try {
-			Iterator<User> it = MyServer.loggedInUsers.iterator();
-			while (it.hasNext()) {
-				User currUser = it.next();
-				if (!currUser.getUserName().equals(username)) {
-					Socket receiverSocket = currUser.getSocket();
-					PrintWriter out = new PrintWriter(receiverSocket.getOutputStream(), true);
-					out.println(message);
-				}
+			if (blockedFromUsers.contains(userName)) {
+				PrintWriter out = new PrintWriter(this.clientSocket.getOutputStream(), true);
+				String blockedMessage = "Blocked from sending to " + userName;
+				out.println(blockedMessage);
+			} else {
+				PrintWriter out = new PrintWriter(s.getOutputStream(), true);
+				out.println(message);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
+	private void unblockUser(String user) {
+		if (!blockedUsers.contains(user)) {
+			return;
+		}
+		this.lock.lock();
+		try {
+			File initial_file = new File(blockedUsersFileName);
+			BufferedReader br = new BufferedReader(new FileReader(blockedUsersFileName));
+			String tmp = "tmp_f";
+			File tmp_file = new File(tmp);
+			BufferedWriter bw = new BufferedWriter(new FileWriter(tmp_file));
+			String line;
+			while ((line = br.readLine()) != null) {
+				String[] blockedData = line.split(" ");
+				if (blockedData[0].equals(this.currUsername) && blockedData[1].equals(user)) {
+					continue;
+				}
+				bw.write(line);
+				bw.write('\n');
+			}
+			boolean removedBlock = tmp_file.renameTo(initial_file);
+			if (removedBlock) {
+				blockedUsers.remove(user);
+			}
+			br.close();
+			bw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			this.lock.unlock();
+		}
+	}
+
+	private void blockUser(String user) {
+		if (blockedUsers.contains(user)) {
+			return;
+		}
+		this.lock.lock();
+		try {
+			File initial_file = new File(blockedUsersFileName);
+			BufferedWriter bw = new BufferedWriter(new FileWriter(initial_file, true));
+			String line = this.currUsername + " " + user + '\n';
+			bw.write(line);
+			bw.close();
+			blockedUsers.add(user);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			this.lock.unlock();
+		}
+	}
 	private String stringBuilderFromArray(String[] ar, int start, int end) {
 		StringBuilder sb = new StringBuilder("");
 		for (int i = start; i < end; i++) {
