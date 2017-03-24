@@ -16,14 +16,17 @@ mvn exec:java -Dexec.mainClass=Main -Dexec.args="<port_number>"
 
 How to run client:
 
-mvn exec:java -Dexec.mainClass=MyClient -Dexec.args="<host> <port_number>"
+mvn exec:java -Dexec.mainClass=MyClient -Dexec.args=" <host> <port_number>"
 
 
 Commands:
 
-- message
+- message <person>
    - Sends message to another user e.g. message Andy hey whats up
-
+- articles <news_source>
+   - gets articles from source
+- sources
+   - returns news sources
 - Done
    - Logs user out
 
@@ -31,5 +34,5 @@ TODO
 
 - Add some sort of crypto to communications
    - messages are sent in cleartext
-- Add client code
-- Add support for me types of commands user can use
+- Add support for more types of commands user can use
+  - specifically news api ones
