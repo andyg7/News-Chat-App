@@ -53,7 +53,6 @@ public class NewsApi {
 			while ((line = br.readLine()) != null) {
 				response.append(line);
 			}
-
 			br.close();
 			return response.toString();
 		}
