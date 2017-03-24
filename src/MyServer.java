@@ -15,6 +15,8 @@ public class MyServer extends Thread {
 	private Lock lock;
 	private String usersFileName = "../database_files/user_pass.txt";
 	private String blockedUsersFileName = "../database_files/blocked_users.txt";
+	private String api_keyFileName = "../API_key/api_key";
+	private String api_key;
 	private HashMap<String, String> usersHash;
 	private HashSet<String> blockedUsers;
 	private HashSet<String> blockedFromUsers;
@@ -24,12 +26,16 @@ public class MyServer extends Thread {
 	public static HashSet<QueuedMessage> queuedMessages;
 	public static HashSet<BlockedAddress> blockedAddresses;
 	public static int maxNumberOpenConnections = 10;
+	private NewsApi apiHandler;
 
 	public MyServer(Socket s, Lock l) {
 		this.clientSocket = s;
 		this.lock = l;
 		initializeDataStructures();
 		readUserPassword();
+		readAPIKey();
+		String url = "https://newsapi.org/v1/articles?";
+		this.apiHandler = new NewsApi(this.api_key);
 	}
 
 	private void initializeDataStructures() {
@@ -45,6 +51,17 @@ public class MyServer extends Thread {
 				String[] user_password = line.split(" ");
 				usersHash.put(user_password[0], user_password[1]);
 			}
+			br.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void readAPIKey() {
+		try (BufferedReader br = new BufferedReader(new FileReader(api_keyFileName))) {
+			String line;
+			line = br.readLine();
+			this.api_key = line;
 			br.close();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -213,6 +230,9 @@ public class MyServer extends Thread {
 		}
 		String parsedCommand = parsedMessage[0];
 		if (parsedCommand.equals("message")) {
+			if (parsedMessage.length != 2) {
+				return;
+			}
 			String userReceiver = parsedMessage[1];
 			String message = stringBuilderFromArray(parsedMessage, 2, parsedMessage.length);
 			StringBuilder sb = new StringBuilder();
@@ -238,17 +258,33 @@ public class MyServer extends Thread {
 				e.printStackTrace();
 			}
 		} else if (parsedCommand.equals("broadcast")) {
+			if (parsedMessage.length != 2) {
+				return;
+			}
 			String message = stringBuilderFromArray(parsedMessage, 1, parsedMessage.length);
 			StringBuilder sb = new StringBuilder();
 			sb.append("Broadcasted message: ");
 			sb.append(message);
 			sendMessageExcept(this.currUsername, sb.toString());
 		} else if (parsedCommand.equals("unblock")) {
+			if (parsedMessage.length != 2) {
+				return;
+			}
 			String userReceiver = parsedMessage[1];
 			unblockUser(userReceiver);
 		} else if (parsedCommand.equals("block")){
+			if (parsedMessage.length != 2) {
+				return;
+			}
 			String userReceiver = parsedMessage[1];
 			blockUser(userReceiver);
+		} else if (parsedCommand.equals("news")) {
+			if (parsedMessage.length != 2) {
+				return;
+			}
+			String newsSource = parsedMessage[1];
+			String response = apiHandler.sendGetSource(newsSource);
+			sendMessage(this.clientSocket, this.currUsername, response);
 		}
 	}
 
