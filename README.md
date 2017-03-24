@@ -16,7 +16,7 @@ mvn exec:java -Dexec.mainClass=Main -Dexec.args="<port_number>"
 
 How to run client:
 
-mvn exec:java -Dexec.mainClass=MyClient -Dexec.args=" <host> <port_number>"
+mvn exec:java -Dexec.mainClass=MyClient -Dexec.args=" <host_name> <port_number>"
 
 
 Commands:
