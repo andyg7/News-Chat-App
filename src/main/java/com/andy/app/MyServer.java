@@ -13,9 +13,9 @@ public class MyServer extends Thread {
 	private int portNumber;
 	private Socket clientSocket;
 	private Lock lock;
-	private String usersFileName = "../database_files/user_pass.txt";
-	private String blockedUsersFileName = "../database_files/blocked_users.txt";
-	private String api_keyFileName = "../API_key/api_key";
+	private String usersFileName = "/Users/andrewgrant/Documents/My-Chat-App/database_files/user_pass.txt";
+	private String blockedUsersFileName = "/Users/andrewgrant/Documents/My-Chat-App/database_files/blocked_users.txt";
+	private String api_keyFileName = "/Users/andrewgrant/Documents/My-Chat-App/API_key/api_key";
 	private String api_key;
 	private HashMap<String, String> usersHash;
 	private HashSet<String> blockedUsers;
@@ -44,7 +44,8 @@ public class MyServer extends Thread {
 	}
 
 	private void readUserPassword() {
-		try (BufferedReader br = new BufferedReader(new FileReader(usersFileName))) {
+		try {
+			BufferedReader br = new BufferedReader(new FileReader(usersFileName));	
 			String line;
 			while ((line = br.readLine()) != null) {
 				String[] user_password = line.split(" ");
@@ -57,7 +58,8 @@ public class MyServer extends Thread {
 	}
 
 	private void readAPIKey() {
-		try (BufferedReader br = new BufferedReader(new FileReader(api_keyFileName))) {
+		try {
+			BufferedReader br = new BufferedReader(new FileReader(api_keyFileName));
 			String line;
 			line = br.readLine();
 			this.api_key = line;
@@ -178,7 +180,8 @@ public class MyServer extends Thread {
 
 	private void readBlockedUsers() {
 		this.lock.lock();
-		try (BufferedReader br = new BufferedReader(new FileReader(blockedUsersFileName))) {
+		try  {
+			BufferedReader br = new BufferedReader(new FileReader(blockedUsersFileName));
 			String line;
 			while ((line = br.readLine()) != null) {
 				String[] blockedData = line.split(" ");

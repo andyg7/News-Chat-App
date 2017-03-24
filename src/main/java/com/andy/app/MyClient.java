@@ -7,7 +7,7 @@ import org.json.simple.parser.ParseException;
 
 
 public class MyClient implements Runnable {
-	private String api_keyFileName = "../API_key/api_key";
+	private String api_keyFileName = "/Users/andrewgrant/Documents/My-Chat-App/API_key/api_key";
 	private String api_key;
 	private NewsApi apiHandler;
 	private String hostName;
@@ -20,10 +20,12 @@ public class MyClient implements Runnable {
 		readAPIKey();
 		apiHandler = new NewsApi(this.api_key);
 		this.sender = s;
+		System.out.println("hhhhhhhh");
 	}
 
 	private void readAPIKey() {
-		try (BufferedReader br = new BufferedReader(new FileReader(api_keyFileName))) {
+		try {
+			BufferedReader br = new BufferedReader(new FileReader(api_keyFileName));
 			String line;
 			line = br.readLine();
 			this.api_key = line;
@@ -75,6 +77,10 @@ public class MyClient implements Runnable {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	public void parseJson(String response) {
+		JSONParser jsonParser = new JSONParser();
 	}
 
 	public static void main(String args[]) {
