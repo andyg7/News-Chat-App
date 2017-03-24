@@ -1,8 +1,8 @@
-# SimpleChatApp
+# News Chat App
 
 What is this?
 
-It's a simple chat app I'm working on for fun
+It's a chat app for news junkies to share news. Currently powered by https://newsapi.org/ 
 
 Database of Users:
 
