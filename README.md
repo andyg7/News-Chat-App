@@ -11,7 +11,6 @@ e.g. SomeUser SomePasword
 
 How to run the server:
 
-java MyServer <some_port>
 mvn exec:java -Dexec.mainClass=Main -Dexec.args="<port_number>"
 
 How to run client:
