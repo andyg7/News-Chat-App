@@ -68,6 +68,13 @@ public class MyClient implements Runnable {
 				String response = apiHandler.sendGetSource();
 				parseJsonSources(response);
 				out.println("");
+			} else if (parsedCommand.equals("read")) {
+				if (parsedMessage.length <= 1) {
+					return;
+				}
+				String articleUrl = parsedMessage[1];
+				String response = apiHandler.sendGetArticleContent(articleUrl);
+				System.out.println(response);
 			} else {
 				out.println(fullCommand);
 			}
@@ -78,12 +85,12 @@ public class MyClient implements Runnable {
 
 	public void parseJsonSources(String response) {
 		try {
-		JSONObject json = new JSONObject(response);
-		JSONArray arr = json.getJSONArray("sources");
-		for (int i = 0; i < arr.length(); i++) {
-			JSONObject jsonObj  = arr.getJSONObject(i);
-			System.out.println(jsonObj.getString("name"));
-		}
+			JSONObject json = new JSONObject(response);
+			JSONArray arr = json.getJSONArray("sources");
+			for (int i = 0; i < arr.length(); i++) {
+				JSONObject jsonObj  = arr.getJSONObject(i);
+				System.out.println(jsonObj.getString("name"));
+			}
 		} catch (Exception e) {
 
 		}
@@ -91,15 +98,17 @@ public class MyClient implements Runnable {
 
 	public void parseJsonArticles(String response) {
 		try {
-		JSONObject json = new JSONObject(response);
-		JSONArray arr = json.getJSONArray("articles");
-		for (int i = 0; i < arr.length(); i++) {
-			JSONObject jsonObj  = arr.getJSONObject(i);
-			System.out.println("Title:");
-			System.out.println(jsonObj.getString("title"));
-			System.out.println("Description:");
-			System.out.println(jsonObj.getString("description"));
-		}
+			JSONObject json = new JSONObject(response);
+			JSONArray arr = json.getJSONArray("articles");
+			for (int i = 0; i < arr.length(); i++) {
+				JSONObject jsonObj  = arr.getJSONObject(i);
+				System.out.println("Title:");
+				System.out.println(jsonObj.getString("title"));
+				System.out.println("Description:");
+				System.out.println(jsonObj.getString("description"));
+				System.out.println("Url:");
+				System.out.println(jsonObj.getString("url"));
+			}
 		} catch (Exception e) {
 
 		}

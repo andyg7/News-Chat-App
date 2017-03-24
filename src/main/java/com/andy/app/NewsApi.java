@@ -33,6 +33,10 @@ public class NewsApi {
 		return sendGetRequest(this.sourcesUrlString, "");
 	}
 
+	public String sendGetArticleContent(String source) {
+		return sendGetRequest(source, "");
+	}
+
 	private String sendGetRequest(String urlS, String param) {
 		try {
 			URL urlObj = new URL(urlS+param);
