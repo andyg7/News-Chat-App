@@ -35,3 +35,4 @@ TODO
    - messages are sent in cleartext
 - Add support for more types of commands user can use
   - specifically news api ones
+- Implement queued messages
