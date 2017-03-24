@@ -12,35 +12,41 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.Charset;
+//import com.google.code.gson;
 
 public class NewsApi {
-	private String urlString;
+	private String articlesUrlString;
+	private String sourcesUrlString;
 	private String api_key;	
 
 	public NewsApi(String api_key) {
-		this.urlString = "https://newsapi.org/v1/articles?";;
+		this.articlesUrlString = "https://newsapi.org/v1/articles?";
+		this.sourcesUrlString = "https://newsapi.org/v1/sources?";
 		this.api_key = api_key;
 	}
 
 	public NewsApi(String url, String api_key) {
-		this.urlString = url;
+		this.articlesUrlString = url;
 		this.api_key = api_key;
 	}
 
-	public String sendGetSource(String source) {
+	public String sendGetArticle(String source) {
 		String sourceString = "&source="+source;
-		System.out.println(sourceString);
-		return sendGetRequest(sourceString);
+		return sendGetRequest(this.articlesUrlString, sourceString);
 	}
 
-	private String sendGetRequest(String param) {
+	public String sendGetSource() {
+		return sendGetRequest(this.sourcesUrlString, "");
+	}
+
+	private String sendGetRequest(String urlS, String param) {
 		try {
-			URL urlObj = new URL(this.urlString+param);
+			URL urlObj = new URL(urlS+param);
 			HttpsURLConnection httpConnection = (HttpsURLConnection) urlObj.openConnection();
 			httpConnection.setRequestMethod("GET");
 			httpConnection.setRequestProperty("X-Api-Key", this.api_key);
 			int responseCode = httpConnection.getResponseCode();
-			System.out.println("Url : " + this.urlString);
+			System.out.println("Url : " + this.articlesUrlString);
 			System.out.println("rc : " + responseCode);
 
 			BufferedReader br = new BufferedReader(new InputStreamReader(httpConnection.getInputStream()));
