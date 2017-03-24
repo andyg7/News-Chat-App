@@ -283,18 +283,7 @@ public class MyServer extends Thread {
 			}
 			String userReceiver = parsedMessage[1];
 			blockUser(userReceiver);
-		} else if (parsedCommand.equals("article")) {
-			if (parsedMessage.length != 2) {
-				return;
-			}
-			String newsSource = parsedMessage[1];
-			String response = apiHandler.sendGetArticle(newsSource);
-			sendMessage(this.clientSocket, this.currUsername, response);
-		} else if (parsedCommand.equals("sources")) {
-			String response = apiHandler.sendGetSource();
-			sendMessage(this.clientSocket, this.currUsername, response);
-		}
-
+		} 
 	}
 
 	private void sendMessage(String username, String message) {

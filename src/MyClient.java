@@ -13,6 +13,7 @@ public class MyClient implements Runnable {
 	public MyClient(Socket socket, int s)  {
 		this.socket = socket;
 		readAPIKey();
+		apiHandler = new NewsApi(this.api_key);
 		this.sender = s;
 	}
 
@@ -37,11 +38,31 @@ public class MyClient implements Runnable {
 				}
 			} else {
 				BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
-				PrintWriter out = new PrintWriter(this.socket.getOutputStream(), true);
 				while ((userInput = stdIn.readLine()) != null) {
-					out.println(userInput);
+					processCommand(userInput);
 				}
 			} 
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void processCommand(String fullCommand) {
+		String[] parsedMessage = fullCommand.split(" ");
+		String parsedCommand = parsedMessage[0];
+		if (parsedMessage.length == 0) {
+			return;
+		}
+		try {
+			PrintWriter out = new PrintWriter(this.socket.getOutputStream(), true);
+			if (parsedCommand.equals("article")) {
+				String newsSource = parsedMessage[1];
+				String response = apiHandler.sendGetArticle(newsSource);
+			} else if (parsedCommand.equals("sources")) {
+				String response = apiHandler.sendGetSource();
+			} else {
+				out.println(fullCommand);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
