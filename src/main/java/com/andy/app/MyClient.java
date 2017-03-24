@@ -1,9 +1,7 @@
 import java.io.*;
 import java.net.*;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+import org.json.JSONObject;
+import org.json.JSONArray;
 
 
 public class MyClient implements Runnable {
@@ -66,9 +64,9 @@ public class MyClient implements Runnable {
 				String response = apiHandler.sendGetArticle(newsSource);
 				System.out.println(response);
 				out.println("");
-			} else if (parsedCommand.equals("sources")) {
+			} else if (parsedCommand.equals("news_sources")) {
 				String response = apiHandler.sendGetSource();
-				System.out.println(response);
+				parseJsonSources(response);
 				out.println("");
 			} else {
 				out.println(fullCommand);
@@ -78,8 +76,17 @@ public class MyClient implements Runnable {
 		}
 	}
 
-	public void parseJson(String response) {
-		JSONParser jsonParser = new JSONParser();
+	public void parseJsonSources(String response) {
+		try {
+		JSONObject json = new JSONObject(response);
+		JSONArray arr = json.getJSONArray("sources");
+		for (int i = 0; i < arr.length(); i++) {
+			JSONObject jsonObj  = arr.getJSONObject(i);
+			System.out.println(jsonObj.getString("name"));
+		}
+		} catch (Exception e) {
+
+		}
 	}
 
 	public static void main(String args[]) {
