@@ -60,7 +60,7 @@ public class MyServer extends Thread {
 		if (currUsername != null) {
 			try {
 				PrintWriter out = new PrintWriter(this.clientSocket.getOutputStream(), true);
-				String welcomeMsg = "Welcome to the great chat app of all time " + currUsername + "!";
+				String welcomeMsg = "Welcome to the greatest chat app of all time " + currUsername + "!";
 				out.println(welcomeMsg);
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
@@ -113,6 +113,14 @@ public class MyServer extends Thread {
 			if (username == null) {
 				return null;
 			} 
+
+			if (MyServer.userLoggedIn(username) == true) {
+				System.out.println("User already logged in");
+				sendMessage(this.clientSocket, "You're logged in from somewhere else");
+				return null;
+			} else {
+				System.out.println("Valid login");
+			}
 
 			outputLine = "Password:";
 			while (passwordAttempts < 3) {
@@ -171,7 +179,11 @@ public class MyServer extends Thread {
 		if (parsedCommand.equals("message")) {
 			String userReceiver = parsedMessage[1];
 			String message = stringBuilderFromArray(parsedMessage, 2, parsedMessage.length);
-			sendMessage(userReceiver, message);
+			StringBuilder sb = new StringBuilder();
+			sb.append("Message sent from "); 
+			sb.append(this.currUsername); 
+			sb.append(": " + message);
+			sendMessage(userReceiver, sb.toString());
 		} else if (parsedCommand.equals("whoelse")) {
 			StringBuilder sb = new StringBuilder("");
 			Iterator<User> it = MyServer.loggedInUsers.iterator();
@@ -187,8 +199,23 @@ public class MyServer extends Thread {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+		} else if (parsedCommand.equals("broadcast")) {
+			String message = stringBuilderFromArray(parsedMessage, 1, parsedMessage.length);
+			StringBuilder sb = new StringBuilder();
+			sb.append("Broadcasted message: ");
+			sb.append(message);
+			sendMessageExcept(this.currUsername, sb.toString());
 		} else {
 
+		}
+	}
+
+	private void sendMessage(Socket s, String message) {
+		try {
+			PrintWriter out = new PrintWriter(s.getOutputStream(), true);
+			out.println(message);
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 
@@ -201,8 +228,7 @@ public class MyServer extends Thread {
 				if (currUser.getUserName().equals(username)) {
 					Socket receiverSocket = currUser.getSocket();
 					PrintWriter out = new PrintWriter(receiverSocket.getOutputStream(), true);
-					String totalMessage = "Message received from: " + this.currUsername + '\n' + message;
-					out.println(totalMessage);
+					out.println(message);
 					foundUser = true;
 					break;
 				}
@@ -211,6 +237,22 @@ public class MyServer extends Thread {
 				System.out.println("Sent message to " + username + " from " + this.currUsername);
 			} else {
 				System.out.println("Failed to send message to " + username + " from " + this.currUsername);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void sendMessageExcept(String username, String message) {
+		try {
+			Iterator<User> it = MyServer.loggedInUsers.iterator();
+			while (it.hasNext()) {
+				User currUser = it.next();
+				if (!currUser.getUserName().equals(username)) {
+					Socket receiverSocket = currUser.getSocket();
+					PrintWriter out = new PrintWriter(receiverSocket.getOutputStream(), true);
+					out.println(message);
+				}
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -246,7 +288,14 @@ public class MyServer extends Thread {
 	}
 
 	public static boolean userLoggedIn(String username) {
-		return MyServer.loggedInUsers.contains(username);
+		Iterator<User> it = MyServer.loggedInUsers.iterator();
+		while (it.hasNext()) {
+			User currUser = it.next();
+			if (currUser.getUserName().equals(username)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public static boolean removeLoggedInUser(String username) {
