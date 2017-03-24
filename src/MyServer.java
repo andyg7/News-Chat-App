@@ -148,7 +148,7 @@ public class MyServer extends Thread {
 
 			if (MyServer.userLoggedIn(username) == true) {
 				System.out.println("User already logged in");
-				sendMessage(this.clientSocket, this.currUsername, "You're logged in from somewhere else\n");
+				sendMessage(this.clientSocket, this.currUsername, "You're logged in from somewhere else");
 				return null;
 			} else {
 				System.out.println("Valid login");
@@ -241,8 +241,6 @@ public class MyServer extends Thread {
 			sb.append("Message sent from "); 
 			sb.append(this.currUsername); 
 			sb.append(": " + message);
-			sb.append('\n');
-			//System.out.println("send msssg!");
 			sendMessage(userReceiver, sb.toString());
 		} else if (parsedCommand.equals("whoelse")) {
 			StringBuilder sb = new StringBuilder("");
@@ -269,7 +267,6 @@ public class MyServer extends Thread {
 			StringBuilder sb = new StringBuilder();
 			sb.append("Broadcasted message: ");
 			sb.append(message);
-			sb.append('\n');
 			sendMessageExcept(this.currUsername, sb.toString());
 		} else if (parsedCommand.equals("unblock")) {
 			if (parsedMessage.length != 2) {

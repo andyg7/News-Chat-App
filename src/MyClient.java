@@ -34,7 +34,7 @@ public class MyClient implements Runnable {
 			if (this.sender == 1) {
 				BufferedReader in = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
 				while ((userInput = in.readLine()) != null) {
-					System.out.print(userInput);
+					System.out.println(userInput);
 				}
 			} else {
 				BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
@@ -58,8 +58,12 @@ public class MyClient implements Runnable {
 			if (parsedCommand.equals("article")) {
 				String newsSource = parsedMessage[1];
 				String response = apiHandler.sendGetArticle(newsSource);
+				System.out.println(response);
+				out.println("");
 			} else if (parsedCommand.equals("sources")) {
 				String response = apiHandler.sendGetSource();
+				System.out.println(response);
+				out.println("");
 			} else {
 				out.println(fullCommand);
 			}
