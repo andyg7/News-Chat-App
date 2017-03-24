@@ -59,10 +59,10 @@ public class MyClient implements Runnable {
 		}
 		try {
 			PrintWriter out = new PrintWriter(this.socket.getOutputStream(), true);
-			if (parsedCommand.equals("article")) {
+			if (parsedCommand.equals("articles")) {
 				String newsSource = parsedMessage[1];
 				String response = apiHandler.sendGetArticle(newsSource);
-				System.out.println(response);
+				parseJsonArticles(response);
 				out.println("");
 			} else if (parsedCommand.equals("news_sources")) {
 				String response = apiHandler.sendGetSource();
@@ -83,6 +83,22 @@ public class MyClient implements Runnable {
 		for (int i = 0; i < arr.length(); i++) {
 			JSONObject jsonObj  = arr.getJSONObject(i);
 			System.out.println(jsonObj.getString("name"));
+		}
+		} catch (Exception e) {
+
+		}
+	}
+
+	public void parseJsonArticles(String response) {
+		try {
+		JSONObject json = new JSONObject(response);
+		JSONArray arr = json.getJSONArray("articles");
+		for (int i = 0; i < arr.length(); i++) {
+			JSONObject jsonObj  = arr.getJSONObject(i);
+			System.out.println("Title:");
+			System.out.println(jsonObj.getString("title"));
+			System.out.println("Description:");
+			System.out.println(jsonObj.getString("description"));
 		}
 		} catch (Exception e) {
 

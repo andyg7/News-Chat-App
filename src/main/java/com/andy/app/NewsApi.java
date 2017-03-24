@@ -25,11 +25,6 @@ public class NewsApi {
 		this.api_key = api_key;
 	}
 
-	public NewsApi(String url, String api_key) {
-		this.articlesUrlString = url;
-		this.api_key = api_key;
-	}
-
 	public String sendGetArticle(String source) {
 		String sourceString = "&source="+source;
 		return sendGetRequest(this.articlesUrlString, sourceString);
