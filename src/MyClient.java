@@ -1,5 +1,10 @@
 import java.io.*;
 import java.net.*;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
 
 public class MyClient implements Runnable {
 	private String api_keyFileName = "../API_key/api_key";
