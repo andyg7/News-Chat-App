@@ -90,7 +90,7 @@ public class MyServer extends Thread {
 		if (currUsername != null) {
 			try {
 				PrintWriter out = new PrintWriter(this.clientSocket.getOutputStream(), true);
-				String welcomeMsg = "Welcome to the greatest chat app of all time " + currUsername + "!";
+				String welcomeMsg = "Welcome to the greatest chat app of all time " + currUsername + "!\n";
 				out.println(welcomeMsg);
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
@@ -148,7 +148,7 @@ public class MyServer extends Thread {
 
 			if (MyServer.userLoggedIn(username) == true) {
 				System.out.println("User already logged in");
-				sendMessage(this.clientSocket, this.currUsername, "You're logged in from somewhere else");
+				sendMessage(this.clientSocket, this.currUsername, "You're logged in from somewhere else\n");
 				return null;
 			} else {
 				System.out.println("Valid login");
@@ -241,6 +241,7 @@ public class MyServer extends Thread {
 			sb.append("Message sent from "); 
 			sb.append(this.currUsername); 
 			sb.append(": " + message);
+			sb.append('\n');
 			//System.out.println("send msssg!");
 			sendMessage(userReceiver, sb.toString());
 		} else if (parsedCommand.equals("whoelse")) {
@@ -268,6 +269,7 @@ public class MyServer extends Thread {
 			StringBuilder sb = new StringBuilder();
 			sb.append("Broadcasted message: ");
 			sb.append(message);
+			sb.append('\n');
 			sendMessageExcept(this.currUsername, sb.toString());
 		} else if (parsedCommand.equals("unblock")) {
 			if (parsedMessage.length != 2) {

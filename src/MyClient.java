@@ -33,13 +33,12 @@ public class MyClient implements Runnable {
 			if (this.sender == 1) {
 				BufferedReader in = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
 				while ((userInput = in.readLine()) != null) {
-					System.out.println(userInput);
+					System.out.print(userInput);
 				}
 			} else {
 				BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
 				PrintWriter out = new PrintWriter(this.socket.getOutputStream(), true);
 				while ((userInput = stdIn.readLine()) != null) {
-					userInput = userInput + '\n';
 					out.println(userInput);
 				}
 			} 
@@ -54,13 +53,10 @@ public class MyClient implements Runnable {
 		Socket s;
 		try {
 			s = new Socket(h, p);
-			//PrintWriter out = new PrintWriter(s.getOutputStream(), true);
-			//out.println("hyyyyy");
 			MyClient senderClient = new MyClient(s, 1);
 			MyClient receiverClient = new MyClient(s, 0);
 			Thread t1 = new Thread(senderClient, "sender");
 			Thread t2 = new Thread(receiverClient, "receiver");
-			System.out.println("about to start");
 			t1.start();
 			t2.start();
 		} catch (Exception e) {
