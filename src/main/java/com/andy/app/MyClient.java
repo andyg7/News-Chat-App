@@ -39,11 +39,17 @@ public class MyClient implements Runnable {
 				BufferedReader in = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
 				while ((userInput = in.readLine()) != null) {
 					System.out.println(userInput);
+					if (userInput.equals("Done")) {
+						break;
+					}
 				}
 			} else {
 				BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
 				while ((userInput = stdIn.readLine()) != null) {
-					processCommand(userInput);
+					boolean continue_parsing = processCommand(userInput);
+					if (continue_parsing == false) {
+						break;
+					}
 				}
 			} 
 		} catch (Exception e) {
@@ -51,11 +57,11 @@ public class MyClient implements Runnable {
 		}
 	}
 
-	public void processCommand(String fullCommand) {
+	public boolean processCommand(String fullCommand) {
 		String[] parsedMessage = fullCommand.split(" ");
 		String parsedCommand = parsedMessage[0];
 		if (parsedMessage.length == 0) {
-			return;
+			return true;
 		}
 		try {
 			PrintWriter out = new PrintWriter(this.socket.getOutputStream(), true);
@@ -70,17 +76,21 @@ public class MyClient implements Runnable {
 				out.println("");
 			} else if (parsedCommand.equals("read")) {
 				if (parsedMessage.length <= 1) {
-					return;
+					return true;
 				}
 				String articleUrl = parsedMessage[1];
 				String response = apiHandler.sendGetArticleContent(articleUrl);
 				System.out.println(response);
+			} else if (parsedCommand.equals("Done")) {
+				out.println(fullCommand);
+				return false;
 			} else {
 				out.println(fullCommand);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		return true;
 	}
 
 	public void parseJsonSources(String response) {

@@ -13,7 +13,7 @@ public class MyServer extends Thread {
 	private int portNumber;
 	private Socket clientSocket;
 	private Lock lock;
-	private String usersFileName = "/Users/andrewgrant/Documents/My-Chat-App/database_files/user_pass.txt";
+	private String usersFileName = "/Users/andrewgrant/Documents/My-Chat-App/database_files/user_info.txt";
 	private String blockedUsersFileName = "/Users/andrewgrant/Documents/My-Chat-App/database_files/blocked_users.txt";
 	private String api_keyFileName = "/Users/andrewgrant/Documents/My-Chat-App/API_key/api_key";
 	private String api_key;
@@ -215,6 +215,7 @@ public class MyServer extends Thread {
 				out.println(outputLine);
 				System.out.println(inputLine);
 				if (inputLine.equals("Done")) {
+					out.println("Logging user out!");
 					break;
 				} else {
 					intrepretCommand(inputLine);

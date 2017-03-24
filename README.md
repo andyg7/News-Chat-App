@@ -6,7 +6,7 @@ It's a chat app for news junkies to share news. Currently powered by https://new
 
 Database of Users:
 
-use a simple file called "user_pass.txt" to store usernames and password
+use a simple file called "user_info.txt" to store usernames and password
 e.g. SomeUser SomePasword
 
 How to run the server:
