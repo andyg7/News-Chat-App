@@ -210,15 +210,13 @@ public class MyServer extends Thread {
 			outputLine = "Command:";
 			out.println(outputLine);
 
-			//System.out.println("waiting to get line");
 			while ((inputLine = in.readLine()) != null) {
-				out.println(outputLine);
-				System.out.println(inputLine);
 				if (inputLine.equals("Done")) {
 					out.println("Logging user out!");
 					break;
 				} else {
 					intrepretCommand(inputLine);
+					out.println(outputLine);
 				}
 			}
 			System.out.println("Logging out user: " + this.currUsername);
@@ -284,7 +282,10 @@ public class MyServer extends Thread {
 			}
 			String userReceiver = parsedMessage[1];
 			blockUser(userReceiver);
-		} 
+		} else {
+			String unknownCommandMessage = "Unknown command: " + fullCommand;
+			sendMessage(this.currUsername, unknownCommandMessage);
+		}
 	}
 
 	private void sendMessage(String username, String message) {
@@ -383,6 +384,7 @@ public class MyServer extends Thread {
 			this.lock.unlock();
 		}
 	}
+
 	private String stringBuilderFromArray(String[] ar, int start, int end) {
 		StringBuilder sb = new StringBuilder("");
 		for (int i = start; i < end; i++) {

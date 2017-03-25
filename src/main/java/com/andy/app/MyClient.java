@@ -66,21 +66,41 @@ public class MyClient implements Runnable {
 		try {
 			PrintWriter out = new PrintWriter(this.socket.getOutputStream(), true);
 			if (parsedCommand.equals("articles")) {
+				if (parsedMessage.length <= 1) {
+					return true;
+				}
 				String newsSource = parsedMessage[1];
 				String response = apiHandler.sendGetArticle(newsSource);
-				parseJsonArticles(response);
+				if (response != null) {
+					parseJsonArticles(response);
+				}
 				out.println("");
 			} else if (parsedCommand.equals("news_sources")) {
 				String response = apiHandler.sendGetSource();
-				parseJsonSources(response);
+				if (response != null) {
+					parseJsonSources(response);
+				}
 				out.println("");
 			} else if (parsedCommand.equals("read")) {
 				if (parsedMessage.length <= 1) {
 					return true;
 				}
 				String articleUrl = parsedMessage[1];
+				Process p;
+				try {
+					p = Runtime.getRuntime().exec(new String[] { "open", articleUrl });
+					p.waitFor();
+					int ev = p.exitValue();
+					System.out.println("exected");
+					System.out.println(ev);
+				} catch (Exception e) {
+					e.printStackTrace();
+					System.out.println("failed exected");
+				}
 				String response = apiHandler.sendGetArticleContent(articleUrl);
-				System.out.println(response);
+				if (response != null) {
+					//System.out.println(response);
+				}
 			} else if (parsedCommand.equals("Done")) {
 				out.println(fullCommand);
 				return false;
