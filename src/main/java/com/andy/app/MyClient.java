@@ -2,6 +2,7 @@ import java.io.*;
 import java.net.*;
 import org.json.JSONObject;
 import org.json.JSONArray;
+import java.util.*;
 
 
 public class MyClient implements Runnable {
@@ -12,12 +13,18 @@ public class MyClient implements Runnable {
 	private int portNumber;
 	private int sender;
 	private Socket socket;
+	private LinkedList<Article> prevUrlSeen;
 
 	public MyClient(Socket socket, int s)  {
 		this.socket = socket;
 		readAPIKey();
 		apiHandler = new NewsApi(this.api_key);
 		this.sender = s;
+		initializeDataStructures();
+	}
+
+	private void initializeDataStructures() {
+		prevUrlSeen = new LinkedList<Article>();
 	}
 
 	private void readAPIKey() {
@@ -72,7 +79,7 @@ public class MyClient implements Runnable {
 				String newsSource = parsedMessage[1];
 				String response = apiHandler.sendGetArticle(newsSource);
 				if (response != null) {
-					parseJsonArticles(response);
+					parseJsonArticles(newsSource, response);
 				}
 				out.println("");
 			} else if (parsedCommand.equals("news_sources")) {
@@ -86,16 +93,26 @@ public class MyClient implements Runnable {
 					return true;
 				}
 				String articleUrl = parsedMessage[1];
+				if (articleUrl.charAt(0) == '[' && articleUrl.charAt(articleUrl.length() - 1) == ']') {
+					StringBuilder sb = new StringBuilder("");
+					for (int i = 1; i < articleUrl.length() - 1; i++) {
+						sb.append(articleUrl.charAt(i));	
+					}
+					String s = sb.toString();
+					int urlIndex = Integer.parseInt(s);
+					if (urlIndex > prevUrlSeen.size())  {
+						System.out.println("Invalid article index");
+						return true;
+					}
+					articleUrl = prevUrlSeen.get(urlIndex).url;
+				}
 				Process p;
 				try {
 					p = Runtime.getRuntime().exec(new String[] { "open", articleUrl });
 					p.waitFor();
 					int ev = p.exitValue();
-					System.out.println("exected");
-					System.out.println(ev);
 				} catch (Exception e) {
 					e.printStackTrace();
-					System.out.println("failed exected");
 				}
 				String response = apiHandler.sendGetArticleContent(articleUrl);
 				if (response != null) {
@@ -126,18 +143,24 @@ public class MyClient implements Runnable {
 		}
 	}
 
-	public void parseJsonArticles(String response) {
+	public void parseJsonArticles(String source, String response) {
+		prevUrlSeen.clear();
 		try {
 			JSONObject json = new JSONObject(response);
 			JSONArray arr = json.getJSONArray("articles");
 			for (int i = 0; i < arr.length(); i++) {
+				System.out.println("[" + i + "]");
 				JSONObject jsonObj  = arr.getJSONObject(i);
 				System.out.println("Title:");
-				System.out.println(jsonObj.getString("title"));
+				String title = jsonObj.getString("title");
+				System.out.println(title);
 				System.out.println("Description:");
 				System.out.println(jsonObj.getString("description"));
 				System.out.println("Url:");
-				System.out.println(jsonObj.getString("url"));
+				String url = jsonObj.getString("url");
+				System.out.println(url);
+				Article newArticle = new Article(source, title, url);
+				this.prevUrlSeen.addLast(newArticle);
 			}
 		} catch (Exception e) {
 

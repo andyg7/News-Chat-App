@@ -44,8 +44,6 @@ public class NewsApi {
 			httpConnection.setRequestMethod("GET");
 			httpConnection.setRequestProperty("X-Api-Key", this.api_key);
 			int responseCode = httpConnection.getResponseCode();
-			System.out.println("Url : " + urlS);
-			System.out.println("rc : " + responseCode);
 
 			BufferedReader br = new BufferedReader(new InputStreamReader(httpConnection.getInputStream()));
 			String line;
