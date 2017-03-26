@@ -77,11 +77,20 @@ public class MyClient implements Runnable {
 		try {
 			PrintWriter out = new PrintWriter(this.socket.getOutputStream(), true);
 			if (parsedCommand.equals("articles")) {
+				HashMap<String, String> options = new HashMap<String, String>();
 				if (parsedMessage.length <= 1) {
+					System.out.println("articles usage: articles <news_source> <sort_by>");
 					return true;
 				}
 				String newsSource = parsedMessage[1];
-				String response = apiHandler.sendGetArticle(newsSource);
+				for (int i = 2; i < parsedMessage.length; i++) {
+					String option = parsedMessage[i];
+					String[] splitOption = option.split("=");
+					if (splitOption.length > 1) {
+						options.put(splitOption[0], splitOption[1]);
+					}
+				}
+				String response = apiHandler.sendGetArticles(newsSource, options);
 				if (response != null) {
 					parseJsonArticles(newsSource, response);
 				}
@@ -93,10 +102,10 @@ public class MyClient implements Runnable {
 					response = apiHandler.sendGetSources(options);
 				} else {
 					for (int i = 1; i < parsedMessage.length; i++) {
-						String option1 = parsedMessage[i];
-						String[] splitOption1 = option1.split("=");
-						if (splitOption1.length > 1) {
-							options.put(splitOption1[0], splitOption1[1]);
+						String option = parsedMessage[i];
+						String[] splitOption = option.split("=");
+						if (splitOption.length > 1) {
+							options.put(splitOption[0], splitOption[1]);
 						}
 					}
 					response = apiHandler.sendGetSources(options);
@@ -155,6 +164,9 @@ public class MyClient implements Runnable {
 			} else if (parsedCommand.equals("categories")) {
 				String categories = "business, entertainment, gaming, general, music, science-and-nature, sport, technology";
 				System.out.println(categories);	
+			} else if (parsedCommand.equals("languages")) {
+				String languages = "english=en, german=de, french=fr";
+				System.out.println(languages);	
 			} else {
 				out.println(fullCommand);
 			}

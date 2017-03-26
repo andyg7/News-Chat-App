@@ -26,9 +26,22 @@ public class NewsApi {
 		this.api_key = api_key;
 	}
 
-	public String sendGetArticle(String source) {
-		String sourceString = "&source="+source;
-		return sendGetRequest(this.articlesUrlString, sourceString);
+	public String sendGetArticles(String source, HashMap<String, String> options) {
+		StringBuilder sourceWithOptions = new StringBuilder("");
+		sourceWithOptions.append(this.articlesUrlString);
+		sourceWithOptions.append("source=");
+		sourceWithOptions.append(source);
+		Iterator<String> it = options.keySet().iterator();
+		while (it.hasNext()) {
+			sourceWithOptions.append("&");
+			String option = it.next();
+			String value = options.get(option);
+			sourceWithOptions.append(option);
+			sourceWithOptions.append("=");
+			sourceWithOptions.append(value);
+		}
+		System.out.println(sourceWithOptions.toString());
+		return sendGetRequest(sourceWithOptions.toString(), "");
 	}
 
 	public String sendGetSources(HashMap<String, String> options) {
@@ -46,10 +59,6 @@ public class NewsApi {
 			}
 		}
 		return sendGetRequest(sourceWithOptions.toString(), "");
-	}
-
-	public String sendGetArticleContent(String source) {
-		return sendGetRequest(source, "");
 	}
 
 	private String sendGetRequest(String urlS, String param) {
