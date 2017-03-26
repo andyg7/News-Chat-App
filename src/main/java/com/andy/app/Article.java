@@ -1,4 +1,5 @@
 public class Article {
+
 	public String source;
 	public String title;
 	public String url;

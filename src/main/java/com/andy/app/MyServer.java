@@ -243,6 +243,7 @@ public class MyServer extends Thread {
 			sendMessage(userReceiver, sb.toString());
 		} else if (parsedCommand.equals("whoelse")) {
 			StringBuilder sb = new StringBuilder("");
+			sb.append("Other online users: \n");
 			Iterator<User> it = MyServer.loggedInUsers.iterator();
 			while (it.hasNext()) {
 				User currUser = it.next();

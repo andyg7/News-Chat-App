@@ -50,11 +50,15 @@ public class MyClient implements Runnable {
 						break;
 					}
 				}
+				MyClient.clientsDone = 1;
 			} else {
 				BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
 				while ((userInput = stdIn.readLine()) != null) {
 					boolean continue_parsing = processCommand(userInput);
 					if (continue_parsing == false) {
+						break;
+					}
+					if (MyClient.clientsDone == 1) {
 						break;
 					}
 				}
@@ -181,11 +185,13 @@ public class MyClient implements Runnable {
 		}
 	}
 
+	public static int clientsDone;
 	public static void main(String args[]) {
 		String h = args[0];
 		int p = Integer.parseInt(args[1]);
 		Socket s;
 		try {
+			clientsDone = 0;
 			s = new Socket(h, p);
 			MyClient senderClient = new MyClient(s, 1);
 			MyClient receiverClient = new MyClient(s, 0);
