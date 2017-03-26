@@ -201,11 +201,12 @@ public class MyClient implements Runnable {
 				String title = jsonObj.getString("title");
 				System.out.println(title);
 				System.out.println("Description:");
-				System.out.println(jsonObj.getString("description"));
+				String description = jsonObj.getString("description");
+				System.out.println(description);
 				System.out.println("Url:");
 				String url = jsonObj.getString("url");
 				System.out.println(url);
-				Article newArticle = new Article(source, title, url);
+				Article newArticle = new Article(source, title, url, description);
 				this.prevUrlSeen.addLast(newArticle);
 			}
 		} catch (Exception e) {

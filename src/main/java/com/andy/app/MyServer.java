@@ -237,7 +237,7 @@ public class MyServer extends Thread {
 			String userReceiver = parsedMessage[1];
 			String message = stringBuilderFromArray(parsedMessage, 2, parsedMessage.length);
 			StringBuilder sb = new StringBuilder();
-			sb.append("Message sent from "); 
+			sb.append("Message received from "); 
 			sb.append(this.currUsername); 
 			sb.append(": " + message);
 			sendMessage(userReceiver, sb.toString());
