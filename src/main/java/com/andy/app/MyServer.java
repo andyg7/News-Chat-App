@@ -77,13 +77,11 @@ public class MyServer extends Thread {
 				PrintWriter out = new PrintWriter(this.clientSocket.getOutputStream(), true);
 				out.println(msg);
 			} catch (IOException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 			try {
 				this.clientSocket.close();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			return;
@@ -95,7 +93,6 @@ public class MyServer extends Thread {
 				String welcomeMsg = "Welcome to the greatest chat app of all time " + currUsername + "!\n";
 				out.println(welcomeMsg);
 			} catch (IOException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 			SocketAddress sa = clientSocket.getRemoteSocketAddress();

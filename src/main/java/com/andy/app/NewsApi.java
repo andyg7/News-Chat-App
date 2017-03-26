@@ -14,6 +14,7 @@ import java.io.Reader;
 import java.nio.charset.Charset;
 
 public class NewsApi {
+
 	private String articlesUrlString;
 	private String sourcesUrlString;
 	private String api_key;	
@@ -55,6 +56,7 @@ public class NewsApi {
 			return response.toString();
 		}
 		catch (Exception e) {
+			e.printStackTrace();
 			return null;
 		}
 	}

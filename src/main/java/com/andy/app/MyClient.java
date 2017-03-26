@@ -4,8 +4,8 @@ import org.json.JSONObject;
 import org.json.JSONArray;
 import java.util.*;
 
-
 public class MyClient implements Runnable {
+
 	private String api_keyFileName = "/Users/andrewgrant/Documents/My-Chat-App/API_key/api_key";
 	private String api_key;
 	private NewsApi apiHandler;
@@ -110,17 +110,31 @@ public class MyClient implements Runnable {
 				try {
 					p = Runtime.getRuntime().exec(new String[] { "open", articleUrl });
 					p.waitFor();
-					int ev = p.exitValue();
 				} catch (Exception e) {
 					e.printStackTrace();
-				}
-				String response = apiHandler.sendGetArticleContent(articleUrl);
-				if (response != null) {
-					//System.out.println(response);
 				}
 			} else if (parsedCommand.equals("Done")) {
 				out.println(fullCommand);
 				return false;
+			} else if (parsedCommand.equals("send")) {
+				if (parsedMessage.length <= 1) {
+					return true;
+				}
+				String articleNo = parsedMessage[2];
+				StringBuilder sb = new StringBuilder("");
+				for (int i = 1; i < articleNo.length() - 1; i++) {
+					sb.append(articleNo.charAt(i));	
+				}
+				String s = sb.toString();
+				int urlIndex = Integer.parseInt(s);
+				if (urlIndex > prevUrlSeen.size())  {
+					System.out.println("Invalid article index");
+					return true;
+				}
+				String articleInfo = prevUrlSeen.get(urlIndex).toString();
+				String receipient = parsedMessage[1];
+				String newCommand = "message " + receipient + " " + articleInfo;
+				out.println(newCommand);
 			} else {
 				out.println(fullCommand);
 			}
@@ -139,7 +153,7 @@ public class MyClient implements Runnable {
 				System.out.println(jsonObj.getString("name"));
 			}
 		} catch (Exception e) {
-
+			e.printStackTrace();
 		}
 	}
 
@@ -163,7 +177,7 @@ public class MyClient implements Runnable {
 				this.prevUrlSeen.addLast(newArticle);
 			}
 		} catch (Exception e) {
-
+			e.printStackTrace();
 		}
 	}
 
