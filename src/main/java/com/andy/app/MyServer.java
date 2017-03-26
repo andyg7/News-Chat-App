@@ -281,8 +281,10 @@ public class MyServer extends Thread {
 			String userReceiver = parsedMessage[1];
 			blockUser(userReceiver);
 		} else {
-			String unknownCommandMessage = "Unknown command: " + fullCommand;
-			sendMessage(this.currUsername, unknownCommandMessage);
+			if (!fullCommand.equals("")) {
+				String unknownCommandMessage = "Unknown command: " + fullCommand;
+				sendMessage(this.currUsername, unknownCommandMessage);
+			}
 		}
 	}
 

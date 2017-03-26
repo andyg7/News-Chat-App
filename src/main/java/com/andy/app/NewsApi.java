@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.Charset;
+import java.util.*;
 
 public class NewsApi {
 
@@ -30,8 +31,21 @@ public class NewsApi {
 		return sendGetRequest(this.articlesUrlString, sourceString);
 	}
 
-	public String sendGetSource() {
-		return sendGetRequest(this.sourcesUrlString, "");
+	public String sendGetSources(HashMap<String, String> options) {
+		StringBuilder sourceWithOptions = new StringBuilder("");
+		sourceWithOptions.append(this.sourcesUrlString);
+		Iterator<String> it = options.keySet().iterator();
+		while (it.hasNext()) {
+			String option = it.next();
+			String value = options.get(option);
+			sourceWithOptions.append(option);
+			sourceWithOptions.append("=");
+			sourceWithOptions.append(value);
+			if (it.hasNext()) {
+				sourceWithOptions.append("&");
+			}
+		}
+		return sendGetRequest(sourceWithOptions.toString(), "");
 	}
 
 	public String sendGetArticleContent(String source) {
@@ -56,7 +70,6 @@ public class NewsApi {
 			return response.toString();
 		}
 		catch (Exception e) {
-			e.printStackTrace();
 			return null;
 		}
 	}

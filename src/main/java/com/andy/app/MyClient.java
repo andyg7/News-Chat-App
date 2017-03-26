@@ -87,7 +87,20 @@ public class MyClient implements Runnable {
 				}
 				out.println("");
 			} else if (parsedCommand.equals("news_sources")) {
-				String response = apiHandler.sendGetSource();
+				String response;
+				HashMap<String, String> options = new HashMap<String, String>();
+				if (parsedMessage.length == 1) {
+					response = apiHandler.sendGetSources(options);
+				} else {
+					for (int i = 1; i < parsedMessage.length; i++) {
+						String option1 = parsedMessage[i];
+						String[] splitOption1 = option1.split("=");
+						if (splitOption1.length > 1) {
+							options.put(splitOption1[0], splitOption1[1]);
+						}
+					}
+					response = apiHandler.sendGetSources(options);
+				}
 				if (response != null) {
 					parseJsonSources(response);
 				}
@@ -139,6 +152,9 @@ public class MyClient implements Runnable {
 				String receipient = parsedMessage[1];
 				String newCommand = "message " + receipient + " " + articleInfo;
 				out.println(newCommand);
+			} else if (parsedCommand.equals("categories")) {
+				String categories = "business, entertainment, gaming, general, music, science-and-nature, sport, technology";
+				System.out.println(categories);	
 			} else {
 				out.println(fullCommand);
 			}
