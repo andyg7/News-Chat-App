@@ -7,6 +7,8 @@ import java.util.*;
 public class MyClient implements Runnable {
 
 	private String api_keyFileName = "/Users/andrewgrant/Documents/My-Chat-App/API_key/api_key";
+	private String sources_options_FileName = "/Users/andrewgrant/Documents/My-Chat-App/database_files/sources_options.txt";
+	private String articles_options_FileName = "/Users/andrewgrant/Documents/My-Chat-App/database_files/articles_options.txt";
 	private String api_key;
 	private NewsApi apiHandler;
 	private String hostName;
@@ -14,25 +16,44 @@ public class MyClient implements Runnable {
 	private int sender;
 	private Socket socket;
 	private LinkedList<Article> prevUrlSeen;
+	private HashSet<String> sources_options;
+	private HashSet<String> articles_options;
 
 	public MyClient(Socket socket, int s)  {
+		initializeDataStructures();
 		this.socket = socket;
-		readAPIKey();
+		readAPIKey(this.api_keyFileName);
+		readOptionsData(this.sources_options_FileName, sources_options);
+		readOptionsData(this.articles_options_FileName, articles_options);
 		apiHandler = new NewsApi(this.api_key);
 		this.sender = s;
-		initializeDataStructures();
 	}
 
 	private void initializeDataStructures() {
 		prevUrlSeen = new LinkedList<Article>();
+		sources_options = new HashSet<String>();
+		articles_options = new HashSet<String>();
 	}
 
-	private void readAPIKey() {
+	private void readAPIKey(String fileName) {
 		try {
-			BufferedReader br = new BufferedReader(new FileReader(api_keyFileName));
+			BufferedReader br = new BufferedReader(new FileReader(fileName));
 			String line;
 			line = br.readLine();
 			this.api_key = line;
+			br.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void readOptionsData(String fileName, HashSet<String> options) {
+		try {
+			BufferedReader br = new BufferedReader(new FileReader(fileName));
+			String line;
+			while ((line = br.readLine()) != null) {
+				options.add(line);
+			}
 			br.close();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -86,8 +107,13 @@ public class MyClient implements Runnable {
 				for (int i = 2; i < parsedMessage.length; i++) {
 					String option = parsedMessage[i];
 					String[] splitOption = option.split("=");
-					if (splitOption.length > 1) {
-						options.put(splitOption[0], splitOption[1]);
+					String optionName = splitOption[0];
+					if (articles_options.contains(optionName)) {
+						if (splitOption.length > 1) {
+							options.put(optionName, splitOption[1]);
+						}
+					} else {
+						System.out.println("Unrecognized option: " + optionName);
 					}
 				}
 				String response = apiHandler.sendGetArticles(newsSource, options);
@@ -104,8 +130,13 @@ public class MyClient implements Runnable {
 					for (int i = 1; i < parsedMessage.length; i++) {
 						String option = parsedMessage[i];
 						String[] splitOption = option.split("=");
-						if (splitOption.length > 1) {
-							options.put(splitOption[0], splitOption[1]);
+						String optionName = splitOption[0];
+						if (sources_options.contains(optionName)) {
+							if (splitOption.length > 1) {
+								options.put(splitOption[0], splitOption[1]);
+							} 
+						} else {
+							System.out.println("Unrecognized option: " + optionName);
 						}
 					}
 					response = apiHandler.sendGetSources(options);
