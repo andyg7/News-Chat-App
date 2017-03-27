@@ -6,7 +6,7 @@ import java.util.*;
 
 public class MyClient implements Runnable {
 
-	private String api_keyFileName = "/Users/andrewgrant/Documents/My-Chat-App/API_key/api_key";
+	private String api_keyFileName;
 	private String sources_options_FileName = "/Users/andrewgrant/Documents/My-Chat-App/database_files/sources_options.txt";
 	private String articles_options_FileName = "/Users/andrewgrant/Documents/My-Chat-App/database_files/articles_options.txt";
 	private String api_key;
@@ -19,9 +19,10 @@ public class MyClient implements Runnable {
 	private HashSet<String> sources_options;
 	private HashSet<String> articles_options;
 
-	public MyClient(Socket socket, int s)  {
+	public MyClient(Socket socket, int s, String apiFileLocation)  {
 		initializeDataStructures();
 		this.socket = socket;
+		this.api_keyFileName = apiFileLocation;
 		readAPIKey(this.api_keyFileName);
 		readOptionsData(this.sources_options_FileName, sources_options);
 		readOptionsData(this.articles_options_FileName, articles_options);
@@ -247,14 +248,19 @@ public class MyClient implements Runnable {
 
 	public static int clientsDone;
 	public static void main(String args[]) {
+		if (args.length != 3) {
+			System.out.println("Invalid number of arguments.");
+			return;
+		}
 		String h = args[0];
 		int p = Integer.parseInt(args[1]);
+		String apiFileLocation = args[2];
 		Socket s;
 		try {
 			clientsDone = 0;
 			s = new Socket(h, p);
-			MyClient senderClient = new MyClient(s, 1);
-			MyClient receiverClient = new MyClient(s, 0);
+			MyClient senderClient = new MyClient(s, 1, apiFileLocation);
+			MyClient receiverClient = new MyClient(s, 0, apiFileLocation);
 			Thread t1 = new Thread(senderClient, "sender");
 			Thread t2 = new Thread(receiverClient, "receiver");
 			t1.start();
