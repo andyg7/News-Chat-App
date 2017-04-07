@@ -1,8 +1,11 @@
 # News Chat App
 
-What is this?
+#What is this?
 
-It's a chat app for news junkies to share news. Currently powered by https://newsapi.org/ 
+It's a chat app for news junkies to share news. Currently powered by https://newsapi.org/ . Basically you can browse news
+articles, open them up in an external browser, and chat and send article info to other chat users. 
+
+#Development Information
 
 Database of Users:
 
