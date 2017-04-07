@@ -1,11 +1,11 @@
 # News Chat App
 
-#What is this?
+## What is this?
 
 It's a chat app for news junkies to share news. Currently powered by https://newsapi.org/ . Basically you can browse news
 articles, open them up in an external browser, and chat and send article info to other chat users. 
 
-#Development Information
+## Development Information
 
 Database of Users:
 
@@ -25,7 +25,7 @@ New API Key
 Need an api key to access news information from the app. Get a key at https://newsapi.org/
 
 
-Commands:
+## Commands:
 
 - message <person>
    - Sends message to another user e.g. message Andy hey whats up
@@ -49,7 +49,7 @@ Commands:
 - Done
    - Logs user out
 
-TODO
+## TODO
 
 - Add some sort of crypto to communications
    - messages are sent in cleartext
