@@ -2,33 +2,54 @@
 
 ## What is this?
 
-It's a chat app for news junkies to share news. Currently powered by https://newsapi.org/ . Basically you can browse news
-articles, open them up in an external browser, and chat and send article info to other chat users. 
+It's a chat app for news junkies to share news. Basically you can browse news articles, open them up in an external browser, and chat and send article info to other chat users. Currently powered by https://newsapi.org/.
 
 ## Development Information
+
+Written in Java on a Mac
+
+### Required files
 
 Database of Users:
 
 use a simple file called "user_info.txt" to store usernames and password
 e.g. SomeUser SomePasword
 
+Options on how to view articles
+
+articles_options.txt	
+
+Blocked users file
+
+blocked_users.txt	
+
+Options for which news sources to browse
+
+sources_options.txt
+
+### How to run
+
+I use maven to compile and run. There's a pom file in the root.
+
 How to run the server:
 
 mvn exec:java -Dexec.mainClass=Main -Dexec.args="<port_number>"
 
+e.g. mvn exec:java -Dexec.mainClass=Main -Dexec.args="4141"
+
 How to run client:
 
-mvn exec:java -Dexec.mainClass=MyClient -Dexec.args=" <host_name> <port_number> <api_file_location>"
+mvn exec:java -Dexec.mainClass=MyClient -Dexec.args="localhost 4141 API_FOLDER/api_key"
 
-New API Key
+### New API Key
 
-Need an api key to access news information from the app. Get a key at https://newsapi.org/
+Need an api key to access news information from the app. Get a (free) key at https://newsapi.org/
 
-
-## Commands:
+## Commands (this is a subset):
 
 - message <person>
-   - Sends message to another user e.g. message Andy hey whats up
+   - Sends message to another user 
+   - e.g. message Andy hey whats up
 - articles <news_source>
    - gets articles from source
    - Examples:
@@ -52,8 +73,9 @@ Need an api key to access news information from the app. Get a key at https://ne
 ## TODO
 
 - Add some sort of crypto to communications
-   - messages are sent in cleartext
+   - messages are sent in cleartext!
 - Add support for more types of commands user can use
   - specifically news api ones
 - Implement queued messages
 - Add groups
+
